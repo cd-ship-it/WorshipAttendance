@@ -1,0 +1,17 @@
+{
+    "name": "worship-attendance/app",
+    "description": "WorshipAttendance application",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "google/apiclient": "^2.19"
+    },
+    "config": {
+        "vendor-dir": "../vendor"
+    },
+    "autoload": {
+        "psr-4": {
+            "WorshipAttendance\\": "src/"
+        }
+    }
+}

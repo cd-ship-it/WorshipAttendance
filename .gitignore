@@ -1,0 +1,22 @@
+# Credentials and secrets
+credentials.json
+client_secret.json
+.env
+.env.local
+.env.*.local
+
+# Composer (vendor is ../vendor, ignore if present in project)
+/vendor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
