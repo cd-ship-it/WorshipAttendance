@@ -232,6 +232,8 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
         .saved-completed .message { font-size: 1.5rem; font-weight: 600; color: #2e7d32; margin-bottom: 1rem; }
         .saved-completed .back { color: var(--accent); text-decoration: none; margin-top: 0.5rem; }
         .saved-completed .back:hover { text-decoration: underline; }
+        .saved-completed .btn-done { display: inline-block; margin-top: 1.5rem; padding: 1rem 2.5rem; font-size: 1.5rem; font-weight: 700; background: var(--accent); color: #fff; border: none; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(0,102,204,.35); }
+        .saved-completed .btn-done:hover { filter: brightness(1.08); transform: scale(1.02); }
 
         .campus-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; max-width: 32rem; }
         .campus-btn { display: block; padding: 1rem; background: var(--card); border: 1px solid #d2d2d7; border-radius: 8px; color: var(--text); text-align: center; text-decoration: none; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
@@ -250,6 +252,7 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
     <div class="saved-completed">
         <p class="message">Saved Completed</p>
         <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId); ?>" class="back">Pick another date</a>
+        <a href="https://crosspointchurchsv.org/gum" class="btn-done">I am done</a>
     </div>
 <?php elseif ($campusId === null): ?>
     <h1>Select Campus</h1>
@@ -295,21 +298,15 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
             <input type="hidden" name="v[<?php echo (int) $i; ?>]" value="<?php echo htmlspecialchars(isset($editRow[$i]) ? (string) $editRow[$i] : ''); ?>">
             <?php endif; endforeach; ?>
             <table>
-                <thead>
-                    <tr>
-                        <th>Column</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
                 <tbody>
                     <?php foreach ($headers as $i => $colName):
                         if (strtolower(trim((string) $colName)) === 'timestamp') continue;
-                        $isServiceDate = (strtolower(trim((string) $colName)) === 'service date');
+                        $isDateColumn = in_array(strtolower(trim((string) $colName)), [ 'service date', 'sunday date' ], true);
                         $cellVal = isset($editRow[$i]) ? (string) $editRow[$i] : ''; ?>
                     <tr>
                         <th scope="row"><?php echo htmlspecialchars((string) $colName); ?></th>
                         <td>
-                            <?php if ($isServiceDate): ?>
+                            <?php if ($isDateColumn): ?>
                             <input type="hidden" name="v[<?php echo (int) $i; ?>]" value="<?php echo htmlspecialchars($cellVal); ?>">
                             <span class="readonly-value"><?php echo htmlspecialchars($cellVal); ?></span>
                             <?php else: ?>
