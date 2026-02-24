@@ -267,7 +267,7 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
     <?php endif; ?>
 
     <?php if (!$error && $editRowIndex === null && count($lastTenRows) > 0): ?>
-        <p style="margin: 1rem 0; color: var(--muted);">Last 10 dates (newest first). Select the row to edit.</p>
+        <p style="margin: 1rem 0; color: var(--muted);">Pick a wroship date to edit.</p>
         <ul class="row-list">
             <?php foreach ($lastTenRows as $item): list($rowIdx, $rowData, $colB) = $item; ?>
             <li>
@@ -286,6 +286,9 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
             <span class="saving-text">Saving…</span>
         </div>
         <form method="post" action="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId . '&row=' . $editRowIndex); ?>" id="sheet-form">
+        <div>
+    <button type="submit" class="btn" id="save-btn">Save to sheet</button>
+    </div>
             <input type="hidden" name="campus" value="<?php echo htmlspecialchars($campusId); ?>">
             <input type="hidden" name="last_row_index" value="<?php echo (int) $editRowIndex; ?>">
             <?php foreach ($headers as $i => $colName): if (strtolower(trim((string) $colName)) === 'timestamp'): ?>
