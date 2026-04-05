@@ -3,6 +3,12 @@
  * Worship Attendance: select campus → pick from last 10 rows (Column B, newest first) → edit row.
  * Paths from .env; requires Sheets API scope in credentials.
  */
+if (!headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+}
+
 $projectRoot = __DIR__;
 
 // Load .env
@@ -198,12 +204,16 @@ if (!is_file($credentialsPath)) {
 }
 
 $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
+// Unique per page load so internal links bypass browser cache (stale form values)
+$navV = 'v=' . bin2hex(random_bytes(4));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <title><?php echo $campusId ? htmlspecialchars($CAMPUSES[$campusId][0] ?? 'Sheet') : 'Worship Attendance'; ?> – Edit row</title>
     <style>
         :root { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --muted: #6e6e73; --accent: #0066cc; }
@@ -251,7 +261,7 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
 <?php if ($saveSuccess): ?>
     <div class="saved-completed">
         <p class="message">Saved Completed</p>
-        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId); ?>" class="back">Pick another date</a>
+        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . urlencode($campusId) . '&' . $navV); ?>" class="back">Pick another date</a>
         <a href="https://crosspointchurchsv.org/gum" class="btn-done">I am done</a>
     </div>
 <?php elseif ($campusId === null): ?>
@@ -259,22 +269,22 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
     <p style="margin-bottom: 1rem; color: var(--muted);">Choose the campus to edit attendance.</p>
     <div class="campus-grid">
         <?php foreach ($CAMPUSES as $id => $info): ?>
-        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . $id); ?>" class="campus-btn"><?php echo htmlspecialchars($info[0]); ?></a>
+        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . urlencode($id) . '&' . $navV); ?>" class="campus-btn"><?php echo htmlspecialchars($info[0]); ?></a>
         <?php endforeach; ?>
     </div>
 <?php else: ?>
     <h1><?php echo htmlspecialchars($CAMPUSES[$campusId][0]); ?><?php if ($sheetTitle) echo ' – ' . htmlspecialchars($sheetTitle); ?></h1>
-    <a href="<?php echo htmlspecialchars($selfUrl); ?>" class="btn-link">← Change campus</a>
+    <a href="<?php echo htmlspecialchars($selfUrl . '?' . $navV); ?>" class="btn-link">← Change campus</a>
     <?php if ($error): ?>
         <p class="error"><?php echo htmlspecialchars($error); ?></p>
     <?php endif; ?>
 
     <?php if (!$error && $editRowIndex === null && count($lastTenRows) > 0): ?>
-        <p style="margin: 1rem 0; color: var(--muted);">Pick a wroship date to edit.</p>
+        <p style="margin: 1rem 0; color: var(--muted);">Pick a worship date to edit.</p>
         <ul class="row-list">
             <?php foreach ($lastTenRows as $item): list($rowIdx, $rowData, $colB) = $item; ?>
             <li>
-                <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId . '&row=' . $rowIdx); ?>">
+                <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . urlencode($campusId) . '&row=' . (int) $rowIdx . '&' . $navV); ?>">
                     <span class="date"><?php echo htmlspecialchars((string) $colB); ?></span>
                 </a>
             </li>
@@ -283,12 +293,12 @@ $selfUrl = $_SERVER['PHP_SELF'] ?? 'sheet_last_row.php';
     <?php endif; ?>
 
     <?php if (!$error && $editRowIndex !== null && count($headers) > 0): ?>
-        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId); ?>" class="btn-link">← Pick different date</a>
+        <a href="<?php echo htmlspecialchars($selfUrl . '?campus=' . urlencode($campusId) . '&' . $navV); ?>" class="btn-link">← Pick different date</a>
         <div id="save-overlay" aria-hidden="true">
             <div class="saving-spinner" aria-hidden="true"></div>
             <span class="saving-text">Saving…</span>
         </div>
-        <form method="post" action="<?php echo htmlspecialchars($selfUrl . '?campus=' . $campusId . '&row=' . $editRowIndex); ?>" id="sheet-form">
+        <form method="post" action="<?php echo htmlspecialchars($selfUrl . '?campus=' . urlencode($campusId) . '&row=' . (int) $editRowIndex . '&' . $navV); ?>" id="sheet-form">
         <div>
     <button type="submit" class="btn" id="save-btn">Save to sheet</button>
     </div>
